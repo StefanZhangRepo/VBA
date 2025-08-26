@@ -1,0 +1,35 @@
+Option Explicit
+
+Sub SmartWrapAndFitColumns()
+    Dim ws As Worksheet
+    Dim col As Range, c As Range
+    Dim maxLen As Long, cellLen As Long, cutoff As Long
+    
+    Set ws = ActiveSheet
+    
+    ' Set cutoff string length for "outlier" threshold (ignore anything bigger than this)
+    cutoff = 80   ' <-- tweak this as you like
+    
+    ' Loop through each non-empty column
+    For Each col In ws.UsedRange.Columns
+        maxLen = 0
+        
+        ' Firstly, wrap all text in column
+        col.WrapText = True
+        
+        ' Secondly, record longest cell length in column
+        For Each c In col.Cells
+            If Len(c.Value) > 0 And cellLen > maxLen Then maxLen = cellLen
+            End If
+        Next c
+        
+        ' Thirdly, apply column width equal to largest cell plus an amount of padding (roughly 1 char = 1 unit width)
+        If maxLen > 0 Then
+            col.ColumnWidth = maxLen + 2 ' add padding
+        End If
+        
+        ' Autofit row height (so wrapped text shows fully)
+        col.EntireRow.AutoFit
+    Next col
+End Sub
+
